@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Custom dark variant targeting .dark class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Declare variables for all themes in @theme, no selectors allowed */
+@theme {
+  /* Light theme variables */
+  --bg-light: #f5f5f7;
+  --bg-secondary-light: #ffffff; /* cards/sections */
+  --text-light: #1f2937;
+  --accent-light: #3b82f6;
+  --muted-light: #6b7280;
+  --success-light: #10B981;
+  --error-light: #EF4444;
+
+  /* Dark theme variables */
+  --bg-dark: #121212;
+  --bg-secondary-dark: #1e1e1e; /* cards/sections */
+  --text-dark: #f3f4f6;
+  --accent-dark: #3b82f6;
+  --muted-dark: #9ca3af;
+  --success-dark: #10B981;
+  --error-dark: #EF4444;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Theme classes */
+.type-theme {
+  --bg: var(--bg-light);
+  --bg-secondary: var(--bg-secondary-light);
+  --text: var(--text-light);
+  --accent: var(--accent-light);
+  --muted: var(--muted-light);
+  --success: var(--success-light);
+  --error: var(--error-light);
+  font-family: 'Inter', 'JetBrains Mono', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.type-theme.dark {
+  --bg: var(--bg-dark);
+  --bg-secondary: var(--bg-secondary-dark);
+  --text: var(--text-dark);
+  --accent: var(--accent-dark);
+  --muted: var(--muted-dark);
+  --success: var(--success-dark);
+  --error: var(--error-dark);
 }
 
+/* Global body styling */
 body {
-  background: var(--background);
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s, color 0.3s;
+  min-height: 100vh;
+  @apply antialiased;
+}
+
+button, input, a{
+  @apply cursor-pointer;
+}
+
+/* Base reusable components */
+
+/* Button */
+.button-primary {
+  @apply px-4 py-2 rounded-md text-white transition;
+  background-color: var(--accent);
+}
+
+.button-primary:hover {
+  filter: brightness(1.1);
+}
+
+/* Card */
+.card {
+  @apply p-4 rounded-md shadow-sm transition;
+  background-color: var(--bg-secondary);
+  color: var(--text);
+}
+
+/* Optional text-muted */
+.text-muted {
+  color: var(--muted);
+}
+
+/* Success and Error text */
+.text-success {
+  color: var(--success);
+}
+
+.text-error {
+  color: var(--error);
+}
+
+/* ProseMirror content styles */
+/* ---- ProseMirror content styles ---- */
+.ProseMirror {
+  @apply outline-none leading-relaxed;
+}
+
+/* Headings */
+.ProseMirror h1 {
+  @apply text-3xl font-bold mt-6 mb-3;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+.ProseMirror h2 {
+  @apply text-2xl font-semibold mt-5 mb-2;
+  color: var(--foreground);
+}
+.ProseMirror h3 {
+  @apply text-xl font-semibold mt-4 mb-2;
+  color: var(--foreground);
+}
+.ProseMirror h4 {
+  @apply text-lg font-semibold mt-3 mb-1;
+  color: var(--foreground);
+}
+.ProseMirror h5 {
+  @apply text-base font-semibold mt-2 mb-1;
+  color: var(--foreground);
+}
+.ProseMirror h6 {
+  @apply text-sm font-semibold mt-2 mb-1 uppercase tracking-wide;
+  color: var(--foreground);
+}
+
+/* Paragraphs */
+.ProseMirror p {
+  @apply mb-3;
+  color: var(--foreground);
+}
+
+/* Lists */
+.ProseMirror ul {
+  @apply list-disc pl-6 mb-3;
+  color: var(--foreground);
+}
+.ProseMirror ol {
+  @apply list-decimal pl-6 mb-3;
+  color: var(--foreground);
+}
+.ProseMirror li {
+  @apply mb-1;
+}
+
+/* Blockquote */
+.ProseMirror blockquote {
+  @apply border-l-4 pl-4 italic my-3;
+  border-color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+/* Inline Code */
+.ProseMirror code {
+  @apply px-1 py-0.5 rounded font-mono text-sm;
+  background: var(--muted);
+  color: var(--accent-foreground);
+}
+
+/* Code Blocks */
+.ProseMirror pre {
+  @apply p-4 rounded-md overflow-x-auto font-mono text-sm my-4;
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+/* Horizontal Rule */
+.ProseMirror hr {
+  @apply my-4 border-t;
+  border-color: var(--muted);
 }

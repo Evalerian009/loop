@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📌 PROJECT ROADMAP — TypeTogether (Convex + Clerk)
 
-## Getting Started
+## 🛠 TECH STACK & ROLES
 
-First, run the development server:
+| Layer             | Choice                                         | Notes                                                                  |
+| ----------------- | ---------------------------------------------- | ---------------------------------------------------------------------- |
+| **Framework**     | Next.js (App Router)                           | Frontend + API routes                                                  |
+| **Styling**       | TailwindCSS + Headless UI                      | Responsive UI, modals, dropdowns                                       |
+| **Auth**          | Clerk                                          | Handles Google login, sessions, secure cookies                         |
+| **Database**      | Convex                                         | Realtime, strongly-typed document DB                                   |
+| **DB Access**     | Convex Client                                  | Direct queries & subscriptions                                         |
+| **Editor**        | Tiptap                                         | Rich text editor                                                       |
+| **Collaboration** | Y.js                                           | CRDT for realtime sync                                                 |
+| **Transport**     | Convex + Y.js                                  | Convex handles reactive DB updates; Y.js handles collaborative editing |
+| **Notifications** | Convex subscriptions                           | Trigger on comments, shares, presence                                  |
+| **Hosting**       | Vercel (frontend), Convex Cloud (backend + DB) | Hosting & deployment                                                   |
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📆 MILESTONES
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Milestone 1 – Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* Init Next.js + Tailwind + Headless UI
+* Install & configure Clerk for authentication
+* Setup Convex project & link to Next.js
+* ✅ Feature: User authentication integrated with Convex for secure data access
+---
 
-## Learn More
+### Milestone 2 – Database & Document Management
 
-To learn more about Next.js, take a look at the following resources:
+* Create Convex tables: `users`, `documents`, `permissions`
+* Implement CRUD for documents via Convex functions
+* Build UI with search, sort, and document creation
+* ✅ Feature: Docs dashboard like Google Docs home screen
+* ✅ Feature: Document creation, deletion, and inline title editing (basic)
+* ✅ Feature: Permissions system for owners / collaborators
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Milestone 3 – Collaborative Editor (Updated)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* Add Tiptap editor for rich-text editing
+* Integrate Y.js for CRDT-based collaborative editing
+* Use Hocuspocus server for realtime collaboration and snapshot persistence
+* Use Convex for document metadata, permissions, and updatedAt tracking
+✅ Feature: Realtime collaborative editing with persistence
+✅ Feature: Inline document title editing for owners
+✅ Feature: Save versions manually through “Save Version” button
+✅ Feature: Presence / active cursors (awareness) 
+---
 
-## Deploy on Vercel
+### Milestone 4 – Sharing & Permissions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Add share dialog (email / username / link)
+* Store roles (owner / editor / viewer) in `permissions` table
+* Enforce roles in editor UI & API functions
+* Auto-detect user by email **or** username (with Clerk + placeholders)
+* ✅ **Feature:** Secure doc sharing with role-based access
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Milestone 5 – Comments
+
+* Create `comments` table (`docId`, `userId`, `text`, `inlineRange`, `parentId`)
+* Inline + threaded comments UI (sidebar)
+* Sync comments with Convex subscriptions
+* ✅ **Feature:** Threaded inline comments
+
+---
+
+### Milestone 6 – Active Collaborators
+
+* Use Y.js awareness API
+* Show active collaborators (avatars + colored cursors)
+* Sync presence via Convex reactive updates
+* ✅ **Feature:** Realtime collaborator presence
+
+---
+
+### Milestone 7 – Notifications
+
+* Create `notifications` table in Convex (`userId`, `type`, `message`, `read`)
+* Trigger notifications on shares, comments, collaborator joins
+* Add in-app notifications UI (dropdown)
+* ✅ **Feature:** Notifications system
+
+---
+
+### Milestone 8 – Responsiveness & Deploy
+
+* Polish mobile + desktop layouts
+* Add document search, sort, filters
+* Provide loading states, skeleton UIs
+* Deploy frontend → **Vercel**, backend → **Convex Cloud**
+* ✅ **Feature:** Polished, portfolio-ready app
+
+
+layout.tsx
+globals.css
+app/  
+  |--(auth)/          ***Auth. using clerk directives***
+    |--sign-in/
+      |--[[...sign-in]]/
+        |--page.tsx
+    |--sign-out/
+      |--[[...sign-out]]/
+        |--page.tsx 
+  |--(root)/
+    |--page.tsx       ***Homepage***
+    |--documents/
+      |--page.tsx     ***Documents List***
+      |--[id]/
+        |--page.tsx   ***DocumentPage with editor***
+components/
+  |--CommentsPannelProps.tsx
+  |--Header.tsx
+  |--ShareDialog.tsx
+  |--VersionsTable.tsx
+  |--OnlineUsers.tsx
+  |--NotificationsDropdown.tsx
+  |--SyncUser.tsx
+convex/
+  |--schema.ts
+  |--_generated/ ***Content is auto-generated so I'll skip em***
+  |--functions/
+    |--comments.ts
+    |--documents.ts
+    |--notifications.ts
+    |--permissions.ts
+    |--resolveUserId.ts
+    |--updateTitle.ts
+    |--users.ts
+    |--versions.ts
+lib/
+  |--convex.ts
+utils/
+  |--debounce.ts
+hocusocus-server.js
+middleware.ts
+.env.local
+
+***This is pretty much the main stuff, i skipped some for brevity but this is pretty muuch it. i guess you can pretty much figure out what the files are for cus i didn't add to it all the defaults files that .... well irrelevant.***
