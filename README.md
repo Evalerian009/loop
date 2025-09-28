@@ -92,3 +92,50 @@
 * Provide loading states, skeleton UIs
 * Deploy frontend → **Vercel**, backend → **Convex Cloud**
 * ✅ **Feature:** Polished, portfolio-ready app
+
+
+layout.tsx
+globals.css
+app/  
+  |--(auth)/          ***Auth. using clerk directives***
+    |--sign-in/
+      |--[[...sign-in]]/
+        |--page.tsx
+    |--sign-out/
+      |--[[...sign-out]]/
+        |--page.tsx 
+  |--(root)/
+    |--page.tsx       ***Homepage***
+    |--documents/
+      |--page.tsx     ***Documents List***
+      |--[id]/
+        |--page.tsx   ***DocumentPage with editor***
+components/
+  |--CommentsPannelProps.tsx
+  |--Header.tsx
+  |--ShareDialog.tsx
+  |--VersionsTable.tsx
+  |--OnlineUsers.tsx
+  |--NotificationsDropdown.tsx
+  |--SyncUser.tsx
+convex/
+  |--schema.ts
+  |--_generated/ ***Content is auto-generated so I'll skip em***
+  |--functions/
+    |--comments.ts
+    |--documents.ts
+    |--notifications.ts
+    |--permissions.ts
+    |--resolveUserId.ts
+    |--updateTitle.ts
+    |--users.ts
+    |--versions.ts
+lib/
+  |--convex.ts
+utils/
+  |--debounce.ts
+hocusocus-server.js
+middleware.ts
+.env.local
+
+***This is pretty much the main stuff, i skipped some for brevity but this is pretty muuch it. i guess you can pretty much figure out what the files are for cus i didn't add to it all the defaults files that .... well irrelevant.***
