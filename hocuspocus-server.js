@@ -45,4 +45,4 @@ const server = new Server({
 });
 
 server.listen();
-console.log("Hocuspocus server running at ws://localhost:1234");
+console.log("Hocuspocus server running at ws://0.0.0.0:1234 (or ws://localhost:1234)");

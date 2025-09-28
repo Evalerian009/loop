@@ -64,7 +64,7 @@ export default function DocumentPage() {
   const providerRef = useRef<HocuspocusProvider | null>(null);
   if (!providerRef.current && rawDocId) {
     providerRef.current = new HocuspocusProvider({
-      url: "ws://localhost:1234",
+      url: "ws://0.0.0.0:1234",
       name: rawDocId,
       document: ydocRef.current,
     });
