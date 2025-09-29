@@ -1,3 +1,5 @@
+//NotificationsDropdown.tsx
+
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -18,6 +20,8 @@ import {
 } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import clsx from "clsx";
+
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 export function NotificationsDropdown() {
   const router = useRouter();
@@ -87,7 +91,7 @@ export function NotificationsDropdown() {
     }
   };
 
-  const handleNotificationClick = (n: any) => {
+  const handleNotificationClick = (n: Doc<"notifications">) => {
     handleMarkAsRead(n._id); // mark read before navigation
     if (n.documentId) {
       let url = `/documents/${n.documentId}`;

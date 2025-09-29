@@ -1,3 +1,5 @@
+//OnlineUsers.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,7 +21,7 @@ export default function OnlineUsers({ provider }: { provider?: HocuspocusProvide
 
     const handleUpdate = () => {
       const states = Array.from(awareness.getStates().values())
-        .map((s: any) => s?.user)
+        .map((s: { user?: OnlineUser }) => s?.user)
         .filter(Boolean) as OnlineUser[];
       setUsers(states);
     };

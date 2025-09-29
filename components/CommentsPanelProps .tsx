@@ -1,9 +1,11 @@
+//CommentsPanelProps.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import clsx from "clsx";
 
 type CommentsPanelProps = {
@@ -79,7 +81,11 @@ export default function CommentsPanel({
 
   if (!comments) return null;
 
-  const CommentItem = ({ comment, level = 0 }: any) => {
+  const CommentItem = ({ 
+    comment, level = 0 }: {
+    comment: Doc<"comments"> & { replies?: Doc<"comments">[] };
+    level?: number;
+  }) => {
     const [replyText, setReplyText] = useState("");
     const [showReplyBox, setShowReplyBox] = useState(false);
     const canDelete = comment.userId === currentUserId || ownerId === currentUserId;

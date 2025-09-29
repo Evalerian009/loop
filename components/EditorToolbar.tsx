@@ -1,3 +1,5 @@
+//EditorToolbar.tsx
+
 "use client";
 
 import { Editor, useEditorState } from "@tiptap/react";
@@ -85,7 +87,6 @@ export default function EditorToolbar({ editor }: { editor: Editor | null }) {
   });
 
   const divider = <span className="w-px bg-[var(--muted)] mx-1" />;
-console.log(editor.getHTML())
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-1 mb-2 border-b border-[var(--muted)]">
