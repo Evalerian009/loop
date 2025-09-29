@@ -51,7 +51,7 @@ export default defineSchema({
   })
     .index("by_user", ["userId"]) // ✅ we’ll use this for clearAll
     .index("by_user_createdAt", ["userId", "createdAt"])
-    .index("by_user_read", ["userId", "read"]),
+    .index("by_user_read", ["userId", "read"]), 
 
   // === Documents versions table ===
   versions: defineTable({

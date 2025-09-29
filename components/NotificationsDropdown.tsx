@@ -44,12 +44,12 @@ export function NotificationsDropdown() {
   const clearAllNotifications = useMutation(api.functions.notifications.clearAll);
 
   // Local state for preventing double-click spam
-  const [removing, setRemoving] = useState<string | null>(null);
+  const [removing, setRemoving] = useState<Id<"notifications"> | null>(null);
   const [clearing, setClearing] = useState(false);
 
-  const handleMarkAsRead = async (notificationId: string) => {
+  const handleMarkAsRead = async (notificationId: Id<"notifications">) => {
     try {
-      await markAsRead({ notificationId: notificationId as any });
+      await markAsRead({ notificationId });
     } catch (err) {
       console.error("Failed to mark as read:", err);
     }
@@ -64,14 +64,11 @@ export function NotificationsDropdown() {
     }
   };
 
-  const handleRemoveNotification = async (notificationId: string) => {
-    if (!user?.id || removing === notificationId) return; // prevent spamming same id
+  const handleRemoveNotification = async (notificationId: Id<"notifications">) => {
+    if (!user?.id || removing === notificationId) return;
     setRemoving(notificationId);
     try {
-      await removeNotification({
-        notificationId: notificationId as any,
-        userId: user.id,
-      });
+      await removeNotification({ notificationId, userId: user.id });
     } catch (err) {
       console.error("Failed to remove notification:", err);
     } finally {
@@ -100,7 +97,7 @@ export function NotificationsDropdown() {
     }
   };
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type: Doc<"notifications">["type"]) => {
     switch (type) {
       case "share":
         return "📤";
@@ -109,7 +106,7 @@ export function NotificationsDropdown() {
       case "collaborator_joined":
         return "👥";
       default:
-        return "🔔";
+        return "🔔"; // fallback
     }
   };
 
@@ -193,7 +190,7 @@ export function NotificationsDropdown() {
 
           {notifications && notifications.length > 0 ? (
             <div className="divide-y divide-[var(--muted)]">
-              {notifications.map((n: any) => (
+              {notifications.map((n: Doc<"notifications">) => (
                 <MenuItem key={n._id} as={Fragment}>
                   {({ active }) => (
                     <div

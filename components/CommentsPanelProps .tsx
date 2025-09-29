@@ -15,6 +15,10 @@ type CommentsPanelProps = {
   ownerId?: string;
 };
 
+type CommentWithReplies = Doc<"comments"> & {
+  replies?: CommentWithReplies[];
+};
+
 export default function CommentsPanel({
   documentId,
   highlightCommentId,
@@ -60,8 +64,12 @@ export default function CommentsPanel({
   const handleDeleteComment = async (commentId: Id<"comments">) => {
     try {
       await deleteComment({ commentId, userId: currentUserId });
-    } catch (err: any) {
-      alert(err.message || "Failed to delete comment");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert("Failed to delete comment");
+      }
     }
   };
 
@@ -82,8 +90,10 @@ export default function CommentsPanel({
   if (!comments) return null;
 
   const CommentItem = ({ 
-    comment, level = 0 }: {
-    comment: Doc<"comments"> & { replies?: Doc<"comments">[] };
+    comment, 
+    level = 0, 
+  }: {
+    comment: CommentWithReplies;
     level?: number;
   }) => {
     const [replyText, setReplyText] = useState("");
@@ -145,7 +155,7 @@ export default function CommentsPanel({
           </div>
         )}
 
-        {comment.replies?.map((r: any) => (
+        {comment.replies?.map((r: CommentWithReplies) => (
           <CommentItem key={r._id} comment={r} level={level + 1} />
         ))}
       </div>
@@ -179,7 +189,7 @@ export default function CommentsPanel({
 
         {/* Comments List */}
         <div className="space-y-2 flex-1 overflow-y-auto p-2">
-          {comments.map((c: any) => (
+          {comments.map((c: CommentWithReplies) => (
             <CommentItem key={c._id} comment={c} />
           ))}
         </div>
