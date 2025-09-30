@@ -62,13 +62,17 @@ export default function DocumentPage() {
   // --- Yjs & Hocuspocus setup ---
   const ydocRef = useRef<Y.Doc>(new Y.Doc());
   const providerRef = useRef<HocuspocusProvider | null>(null);
+
   if (!providerRef.current && rawDocId) {
     providerRef.current = new HocuspocusProvider({
-      url: "ws://0.0.0.0:1234",
+      url:
+        process.env.NEXT_PUBLIC_HOCUSPOCUS_URL ||
+        "ws://localhost:1234", // fallback for local dev
       name: rawDocId,
       document: ydocRef.current,
     });
   }
+  
   const provider = providerRef.current;
 
   // --- Collaboration user ---
