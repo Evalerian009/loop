@@ -1,17 +1,25 @@
-import "./globals.css"
-import type { Metadata } from "next"
-import Providers from "@/components/Providers"
+import { type Metadata } from 'next'
+import './globals.css'
+import { NextAuthProvider } from "./providers";
 
 export const metadata: Metadata = {
-  title: "LiveDocs",
-  description: "A Google Docs clone with realtime collaboration",
+  title: 'Loop',
+  description: 'Minimal Satck Clone',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html lang="en">
-      <body suppressHydrationWarning >
-        <Providers>{children}</Providers>
+    <html lang="en" className="type-theme">
+      <body suppressHydrationWarning className={`antialiased`}>
+        <NextAuthProvider>
+          <main>
+            {children}
+          </main>
+        </NextAuthProvider>
       </body>
     </html>
   )
