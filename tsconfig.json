@@ -22,6 +22,10 @@
       "@/*": ["./*"]
     }
   },
+<<<<<<< HEAD
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "hocuspocus-server.js", "prisma/seed.js"],
+=======
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "hocuspocus-server.js"],
+>>>>>>> 0e4d343317a51763be69c43dc79d1eb46ac47b72
   "exclude": ["node_modules"]
 }
