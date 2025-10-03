@@ -106,7 +106,7 @@ export default function ChannelPage({ currentUser }: { currentUser: User }) {
           <button
             key={c.id}
             className={`block w-full text-left p-2 rounded ${
-              c.id === channelId ? "bg-blue-500 text-white" : ""
+              c.id === channelId ? "bg-blue-500" : ""
             }`}
             onClick={() => {
               setChannelId(c.id);
