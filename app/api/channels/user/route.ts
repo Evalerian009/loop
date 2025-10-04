@@ -1,3 +1,4 @@
+// app/api/channels/user/route.ts
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";

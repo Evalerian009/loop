@@ -5,5 +5,6 @@
 
 */
 -- AlterTable
-ALTER TABLE "Message" ADD COLUMN     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
+ALTER TABLE "Message" 
+  ADD COLUMN "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT now();

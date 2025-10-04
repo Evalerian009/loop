@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,45 +8,45 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
+  id        String          @id @default(cuid())
   name      String
-  email     String    @unique
+  email     String          @unique
   password  String
-  image     String?   // optional avatar
-
-  messages  Message[] // relation to messages
+  image     String?
+  createdAt DateTime        @default(now())
   channels  ChannelMember[]
-  createdAt DateTime  @default(now())
+  messages  Message[]
+  lastVisitedChannelId String?
 }
 
 model Channel {
   id        String          @id @default(cuid())
   name      String          @unique
   isDM      Boolean         @default(false)
+  createdAt DateTime        @default(now())
   members   ChannelMember[]
   messages  Message[]
-  createdAt DateTime        @default(now())
 }
 
 model Message {
   id        String   @id @default(cuid())
   content   String
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   channel   Channel  @relation(fields: [channelId], references: [id])
   channelId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt     
-  isDeleted Boolean  @default(false)
 }
 
 model ChannelMember {
   id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
-  channel   Channel  @relation(fields: [channelId], references: [id])
   channelId String
   joinedAt  DateTime @default(now())
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
-  @@unique([userId, channelId]) // a user can only join once
+  @@unique([userId, channelId])
 }
