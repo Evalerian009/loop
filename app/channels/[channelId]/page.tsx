@@ -2,54 +2,54 @@
 import { redirect } from "next/navigation";
 import ChannelClient from "./ChannelClient";
 import { prisma } from "@/lib/prisma";
+import { ensureUserInChannel, getOrCreateGeneralChannel } from "@/lib/channel-helpers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-interface Props {
-  params: { channelId: string };
-}
+export default async function ChannelPage({ params }: { params: Promise<{ channelId: string }> }) {
+  const { channelId } = await params;
 
-export default async function ChannelPage(props: Props) {
-  // ⚠️ Await params to satisfy Next.js App Router
-  const params = await props.params; // <--- THIS is key
-  const channelIdFromParams = params.channelId;
-
-  // --- 1. Check user session ---
+  // 1️⃣ Validate session
   const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
+  if (!session?.user?.email) redirect("/login");
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email! },
+    where: { email: session.user.email },
     select: { id: true, name: true },
   });
   if (!user) redirect("/login");
 
-  // --- 2. Fetch all channels ---
+  // 2️⃣ Ensure user is part of this channel
+  await ensureUserInChannel(user.id, channelId);
+
+  // 3️⃣ Fetch channels
   let channels = await prisma.channel.findMany({
-    select: { id: true, name: true },
+    select: { id: true, name: true, isDM: true, createdAt: true },
     orderBy: { name: "asc" },
   });
 
-  // Auto-create General if empty
   if (!channels.length) {
-    const general = await prisma.channel.create({
-      data: { name: "General", isDM: false },
-    });
+    const general = await getOrCreateGeneralChannel();
     channels = [general];
   }
 
-  // --- 3. Validate channelId ---
+  // 4️⃣ Pick current channel
   const currentChannel =
-    channels.find((c) => c.id === channelIdFromParams) ||
+    channels.find((c) => c.id === channelId) ||
     channels.find((c) => c.name.toLowerCase() === "general") ||
     channels[0];
 
-  // Redirect if the requested channelId is invalid
-  if (currentChannel.id !== channelIdFromParams) {
-    redirect(`/channels/${currentChannel.id}`);
+  if (!currentChannel || currentChannel.id !== channelId) {
+    redirect(`/channels/${currentChannel?.id ?? channels[0].id}`);
   }
 
-  // --- 4. Fetch recent messages ---
+  // 🆕 5️⃣ Update user's last visited channel
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { lastVisitedChannelId: currentChannel.id },
+  });
+
+  // 6️⃣ Fetch last 30 messages
   const messages = await prisma.message.findMany({
     where: { channelId: currentChannel.id, isDeleted: false },
     include: { user: { select: { id: true, name: true } } },
@@ -57,7 +57,7 @@ export default async function ChannelPage(props: Props) {
     take: 30,
   });
 
-  // --- 5. Render client component ---
+  // 7️⃣ Render
   return (
     <ChannelClient
       currentUser={user}

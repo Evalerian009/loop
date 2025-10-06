@@ -1,4 +1,3 @@
-// app/api/register/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -11,32 +10,50 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // Hash password
+    // sanitize inputs
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
+
+    // prevent duplicate email
+    const existing = await prisma.user.findUnique({
+      where: { email: cleanEmail },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: "Email already registered" },
+        { status: 400 }
+      );
+    }
+
+    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // create user
     const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+      data: { name: cleanName, email: cleanEmail, password: hashedPassword },
     });
 
-    // Find General channel
-    const generalChannel = await prisma.channel.findUnique({
+    // ensure "General" channel exists
+    const generalChannel = await prisma.channel.upsert({
       where: { name: "General" },
+      update: {},
+      create: { name: "General" },
     });
 
-    if (generalChannel) {
-      // Add user to General channel
-      await prisma.channelMember.create({
-        data: {
-          userId: user.id,
-          channelId: generalChannel.id,
-        },
-      });
-    }
+    // add user to "General" channel
+    await prisma.channelMember.create({
+      data: {
+        userId: user.id,
+        channelId: generalChannel.id,
+      },
+    });
 
     return NextResponse.json({ message: "User registered successfully" });
   } catch (err) {
     console.error("Registration error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

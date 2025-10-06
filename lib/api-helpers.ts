@@ -1,3 +1,5 @@
+// lib/api-helpers.ts
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";

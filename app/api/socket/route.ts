@@ -1,33 +1,39 @@
 // app/api/socket/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import { Server } from "socket.io";
 import { prisma } from "@/lib/prisma";
 
-export const ioHandler = (req: any, res: any) => {
-  // Prevent multiple Socket.IO instances during HMR in dev
-  if (!res.socket.server.io) {
-    console.log("🚀 Setting up Socket.IO server...");
+let io: Server | null = null;
 
-    const io = new Server(res.socket.server, {
-      path: "/api/socket",
+export async function GET(req: NextRequest) {
+  // Initialize only once (preserved across hot reloads)
+  if (!io) {
+    console.log("🚀 Initializing Socket.IO (App Router)...");
+
+    const server = new Server(3001, {
       cors: {
-        origin: "*", // adjust for production
+        origin: "*", // tighten in production
         methods: ["GET", "POST"],
       },
+      path: "/api/socket",
     });
 
-    io.on("connection", (socket) => {
-      console.log("User connected:", socket.id);
+    io = server;
+    // @ts-ignore
+    globalThis._io = io;
 
-      // Join a channel room
+    io.on("connection", (socket) => {
+      console.log("🟢 Client connected:", socket.id);
+
       socket.on("joinChannel", (channelId: string) => {
         socket.join(channelId);
-        console.log(`Socket ${socket.id} joined channel ${channelId}`);
+        console.log(`➡️ ${socket.id} joined channel ${channelId}`);
       });
 
-      // Receive and broadcast messages
       socket.on("sendMessage", async (data) => {
         try {
           const { channelId, content, user } = data;
+          if (!channelId || !content || !user?.id) return;
 
           const msg = await prisma.message.create({
             data: {
@@ -38,22 +44,23 @@ export const ioHandler = (req: any, res: any) => {
             include: { user: true },
           });
 
-          // Broadcast to everyone in that channel
-          io.to(channelId).emit("newMessage", msg);
+          // Use optional chaining to silence the null warning
+          io?.to(channelId).emit("newMessage", msg);
+          console.log(`📨 Sent message to channel ${channelId}`);
         } catch (err) {
-          console.error("Failed to save/send message:", err);
+          console.error("❌ Error saving/sending message:", err);
         }
       });
 
       socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
+        console.log("🔴 Client disconnected:", socket.id);
       });
     });
 
-    res.socket.server.io = io;
+    console.log("✅ Socket.IO server ready on :3001");
   } else {
-    console.log("Socket.IO server already running");
+    console.log("⚙️ Socket.IO already running");
   }
 
-  res.end();
-};
+  return NextResponse.json({ message: "Socket.IO server active" });
+}

@@ -1,35 +1,33 @@
 // app/api/channels/user/route.ts
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { requireUserSession } from "@/lib/session";   // session helper
+import { errorResponse } from "@/lib/api-helpers";    // error handling
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { getOrCreateGeneralChannel } from "@/lib/channel-helpers";
+import { ChannelType } from "@/lib/types";
+
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  try {
+    const user = await requireUserSession();
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    include: {
-      channels: {
-        include: { channel: true },
-      },
-    },
-  });
-
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-  let channels = user.channels.map((cm: { channel: any }) => cm.channel);
-
-  // Ensure General channel is included if user has no channels
-  if (channels.length === 0) {
-    const generalChannel = await prisma.channel.findUnique({
-      where: { name: "General" },
+    const userWithChannels = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { channels: { include: { channel: true } } },
     });
-    if (generalChannel) channels = [generalChannel];
-  }
 
-  return NextResponse.json(channels);
+    if (!userWithChannels) throw new Error("User not found");
+
+    let channels = userWithChannels.channels.map((cm) => cm.channel) as ChannelType[];
+
+    // Ensure General channel exists and is included
+    if (channels.length === 0) {
+      const general = await getOrCreateGeneralChannel();
+      channels = [general];
+    }
+
+    return NextResponse.json(channels);
+  } catch (err) {
+    return errorResponse(err);
+  }
 }

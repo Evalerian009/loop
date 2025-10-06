@@ -17,14 +17,14 @@ export default function LoginPage() {
     setError("");
 
     const result = await signIn("credentials", {
-      redirect: false, // prevent auto redirect so we can handle errors
-      email,
-      password,
-      callbackUrl: "/dashboard", // go to dashboard after login
+      redirect: false,
+      email: email.trim(),
+      password: password.trim(),
+      callbackUrl: "/dashboard",
     });
 
     if (result?.error) {
-      setError("Invalid email or password");
+      setError(result?.error ?? "Login failed");
     } else {
       router.push("/dashboard");
     }
@@ -51,6 +51,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={loading}
         />
         <input
           type="password"
@@ -59,6 +60,7 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          disabled={loading}
         />
         <button
           type="submit"
@@ -67,6 +69,12 @@ export default function LoginPage() {
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+
+        <p className="text-sm text-center mt-3">
+          Don’t have an account?{" "}
+          <a href="/register" className="text-blue-500 hover:underline">Register</a>
+        </p>
+
       </form>
     </div>
   );
